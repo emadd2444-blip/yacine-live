@@ -1,26 +1,22 @@
 import requests
 import json
-import os
 
-def fetch_raw_links():
-    # هذا مصدر جديد وتأكدت أنه يعمل الآن
-    url = "https://raw.githubusercontent.com/mahdiaid/Yacine-TV-API/main/yacine.json"
+def fetch_yacine_links():
+    # هذا مصدر جديد وقوي جداً وتحديثه تلقائي
+    url = "https://raw.githubusercontent.com/Fm-Live/Yacine-TV-API/main/yacine.json"
     try:
-        response = requests.get(url, timeout=15)
+        response = requests.get(url, timeout=20)
         if response.status_code == 200:
             return response.json()
     except:
         return None
 
-# تنفيذ الجلب
-data = fetch_raw_links()
+data = fetch_yacine_links()
 
-# حتى لو فشل الجلب، سنقوم بإنشاء الملف لكي لا ينهار الروبوت
-if not data:
-    print("⚠️ فشل الجلب، سيتم إنشاء ملف احتياطي.")
-    data = {"الخدمة": "جاري التحديث، يرجى المحاولة لاحقاً"}
-
-# حفظ الملف دائماً
-with open('channels.json', 'w', encoding='utf-8') as f:
-    json.dump(data, f, ensure_ascii=False, indent=4)
-    print("✅ تم إنشاء ملف channels.json بنجاح!")
+if data and isinstance(data, dict) and len(data) > 0:
+    with open('channels.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+    print("✅ تم صيد القنوات بنجاح!")
+else:
+    # إذا فشل، لا تحفظ ملفاً تالفاً
+    print("❌ فشل الصيد، المصدر قد يكون متوقف.")
