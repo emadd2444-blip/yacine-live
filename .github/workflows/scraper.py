@@ -1,7 +1,6 @@
 import requests
 import json
 
-# دالة لجلب الروابط من مصدر عام محدث
 def fetch_raw_links():
     url = "https://raw.githubusercontent.com/man-of-war/yacine-api/main/live.json"
     try:
@@ -12,7 +11,6 @@ def fetch_raw_links():
         print(f"Error: {e}")
         return None
 
-# تنفيذ الجلب
 data = fetch_raw_links()
 
 if data:
