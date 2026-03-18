@@ -1,0 +1,33 @@
+herename: Yacine TV Auto Grabber
+
+on:
+  schedule:
+    # سيشتغل الروبوت كل 15 دقيقة تلقائياً
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # زر لتشغيله يدوياً للتجربة
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-on: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run scraper
+        run: python scraper.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'YacineBot'
+          git config --global user.email 'bot@yacine.tv'
+          git add channels.json
+          git commit -m "Auto Update Links" || echo "No changes to commit"
+          git push
