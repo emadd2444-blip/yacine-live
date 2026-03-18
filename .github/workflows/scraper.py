@@ -1,59 +1,46 @@
 import requests
 import json
 
-def fetch_yacine_sports():
-    # قائمة المصادر الموثوقة التي توفر روابط ياسين تيفي الرياضية حالياً
+def main():
+    bot_results = []
+    
+    # قائمة المصادر العملاقة (قنوات عربية + أفلام + مسلسلات)
     sources = [
-        "https://raw.githubusercontent.com/rabilmgh/Yacine-TV-API/main/yacine.json",
-        "https://raw.githubusercontent.com/Fm-Live/Yacine-TV-API/main/yacine.json",
-        "https://raw.githubusercontent.com/Ashraf7mod/yacine-tv-api/main/channels.json"
+        # 1. قنوات عربية مفتوحة مستقرة جداً (الجزيرة، MBC، إلخ)
+        {"url": "https://iptv-org.github.io/iptv/languages/ara.json", "type": "live"},
+        
+        # 2. مكتبة أفلام متنوعة (تحديث مستمر من GitHub)
+        {"url": "https://raw.githubusercontent.com/TheBeastApps/Lists/master/Movies.json", "type": "movie"},
+        
+        # 3. مكتبة مسلسلات وأفلام كرتون
+        {"url": "https://raw.githubusercontent.com/man-of-war/yacine-api/main/vod.json", "type": "movie"}
     ]
     
-    for url in sources:
+    print("🚀 جاري صيد المكتبة الشاملة لعيون عاصم...")
+    for src in sources:
         try:
-            print(f"جاري فحص مصدر الرياضة: {url}")
-            response = requests.get(url, timeout=15)
-            if response.status_code == 200:
-                data = response.json()
-                if data and len(data) > 0:
-                    return data
-        except:
-            continue
-    return {}
+            res = requests.get(src['url'], timeout=15)
+            if res.status_code == 200:
+                data = res.json()
+                # التعامل مع أنواع البيانات المختلفة (List أو Dict)
+                items = data if isinstance(data, list) else data.get('movies', data.get('data', []))
+                
+                for item in items:
+                    name = item.get('name') or item.get('title')
+                    url = item.get('url') or item.get('link')
+                    if name and url:
+                        bot_results.append({
+                            "name": name,
+                            "url": url,
+                            "img": item.get('logo') or item.get('poster') or 'https://via.placeholder.com/150/111/00d2ff?text=ASIM+TV',
+                            "type": src['type']
+                        })
+        except: continue
 
-def main():
-    # 1. جلب الرياضية أولاً (الأولوية القصوى)
-    sports_channels = fetch_yacine_sports()
-    
-    # 2. جلب القنوات المفتوحة (كإضافة لكي لا يكون الموقع فارغاً)
-    open_channels = {}
-    try:
-        res = requests.get("https://iptv-org.github.io/iptv/languages/ara.json", timeout=10)
-        if res.status_code == 200:
-            for ch in res.json():
-                name, url = ch.get('name'), ch.get('url')
-                if name and url:
-                    open_channels[name] = url
-    except:
-        pass
-
-    # 3. دمج القنوات (الرياضية تظهر أولاً)
-    # نستخدم قاموس جديد يضع الرياضية في البداية
-    final_list = {}
-    final_list.update(sports_channels)
-    
-    # إضافة القنوات المفتوحة التي لا توجد في قائمة الرياضة
-    for name, url in open_channels.items():
-        if name not in final_list:
-            final_list[name] = url
-
-    # 4. الحفظ في ملف channels.json
-    if final_list:
-        with open('channels.json', 'w', encoding='utf-8') as f:
-            json.dump(final_list, f, ensure_ascii=False, indent=4)
-        print(f"✅ مبروك! تم جلب {len(sports_channels)} قناة رياضية ومئات القنوات المفتوحة.")
-    else:
-        print("❌ فشل جلب أي قنوات.")
+    # حفظ كل شيء في ملف واحد
+    with open('bot_data.json', 'w', encoding='utf-8') as f:
+        json.dump(bot_results, f, ensure_ascii=False, indent=4)
+    print(f"✅ مبروك! صيد اليوم: {len(bot_results)} مادة ترفيهية.")
 
 if __name__ == "__main__":
     main()
