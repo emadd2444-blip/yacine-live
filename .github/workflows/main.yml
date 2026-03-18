@@ -1,4 +1,30 @@
-name: Yacine TV Auto Grabber
+nname: Yacine TV Auto Grabber
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run scraper
+        run: python scraper.py
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'YacineBot'
+          git config --global user.email 'bot@yacine.tv'
+          git add bot_data.json
+          git commit -m "Update Bot Data" || echo "No changes"
+          git push
+: Yacine TV Auto Grabber
 
 on:
   schedule:
