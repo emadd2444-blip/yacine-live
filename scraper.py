@@ -3,14 +3,12 @@ import json
 
 def main():
     bot_results = []
-    
-    # مصدر 1: قنوات عالمية (مكتبة ضخمة)
+    # مصادر القنوات والأفلام
     sources = [
         "https://iptv-org.github.io/iptv/languages/ara.json",
         "https://raw.githubusercontent.com/yacine-tv/api/main/vod.json"
     ]
     
-    print("جاري صيد المكتبة العملاقة...")
     for url in sources:
         try:
             res = requests.get(url, timeout=15)
@@ -28,7 +26,7 @@ def main():
 
     with open('bot_data.json', 'w', encoding='utf-8') as f:
         json.dump(bot_results, f, ensure_ascii=False, indent=4)
-    print(f"✅ تم صيد {len(bot_results)} مادة ترفيهية!")
+    print("Done!")
 
 if __name__ == "__main__":
     main()
